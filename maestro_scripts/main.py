@@ -75,7 +75,8 @@ while cap.isOpened():
             
             # Send OSC messages
             osc_client.send_message("/vol/1", palm_y)
-
+            osc_client.send_message("/toggle/2", hand_open)
+            osc_client.send_message("/pitch/3", pinch_strength)
             
             # Display for debugging
             cv2.putText(frame, f"Palm X: {palm_x:.2f}", (10, 30), 
