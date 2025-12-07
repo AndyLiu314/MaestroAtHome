@@ -61,14 +61,16 @@ while cap.isOpened():
             
             landmarks = hand_landmarks.landmark
             
-            palm_x = landmarks[9].x 
-            palm_y = (1 - landmarks[9].y) * 10 # inverse for more intuitive controls
+            palm_left = -((landmarks[9].x - 0.5) * 20)
+            palm_right = (landmarks[9].x - 0.5) * 20
+
+            palm_y = (1 - landmarks[9].y) * 15 # inverse for more intuitive controls
             
             # Pinch strength (distance between thumb tip and index tip)
             thumb_tip = landmarks[4]
             index_tip = landmarks[8]
             pinch_dist = calc_distance(thumb_tip, index_tip)
-            pinch_strength = max(0, 1 - (pinch_dist * 5))  # Inverted and scaled
+            pinch_strength = (max(0, 1 - (pinch_dist * 5))) * 3  # Inverted and scaled
             
             # Hand open/closed
             hand_open = check_hand_open(landmarks)
@@ -77,15 +79,20 @@ while cap.isOpened():
             osc_client.send_message("/vol/1", palm_y)
             osc_client.send_message("/toggle/2", hand_open)
             osc_client.send_message("/pitch/3", pinch_strength)
+            osc_client.send_message("/pan_left/4", palm_left)
+            osc_client.send_message("/pan_right/5", palm_right)
+        
             
             # Display for debugging
-            cv2.putText(frame, f"Palm X: {palm_x:.2f}", (10, 30), 
+            cv2.putText(frame, f"Palm Left: {palm_left:.2f}", (10, 30), 
                        cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
-            cv2.putText(frame, f"Palm Y: {palm_y:.2f}", (10, 60), 
+            cv2.putText(frame, f"Palm Right: {palm_right:.2f}", (10, 60), 
                        cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
-            cv2.putText(frame, f"Pinch: {pinch_strength:.2f}", (10, 90), 
+            cv2.putText(frame, f"Palm Y: {palm_y:.2f}", (10, 90), 
                        cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
-            cv2.putText(frame, f"Open: {hand_open}", (10, 120), 
+            cv2.putText(frame, f"Pinch: {pinch_strength:.2f}", (10, 120), 
+                       cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
+            cv2.putText(frame, f"Open: {hand_open}", (10, 150), 
                        cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
     
     cv2.imshow('Hand Gesture Control', frame)
